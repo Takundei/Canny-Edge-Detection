@@ -21,6 +21,8 @@ CannyEdge::CannyEdge(QWidget *parent) :
     ui->previewEdited->fitInView(&editedVideo, Qt::KeepAspectRatio);
     ui->previewEdited->setScene(new QGraphicsScene(this));
     ui->previewEdited->scene()->addItem(&editedVideo);
+    ui->previewOriginal->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->previewOriginal->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     //set threshhold
     ui->ThreshLow->setValue(LOW);
     ui->ThreshLow->setMaximum(HIGH);
@@ -74,11 +76,13 @@ void CannyEdge::on_Convert_clicked()
     ui->progressBar->setEnabled(true);
     ui->Convert->setEnabled(false);
     ui->Abort->setEnabled(true);
+    ui->About->setVisible(false);
        int ret = 0;
     abort = false;
     waitKey(30);
     ret = CannyEdgeDetection();
     if(ret == 1){
+         ui->About->setVisible(true);
         QMessageBox::warning(this,"Warning","Error opening video");
     }
     abort = true;
