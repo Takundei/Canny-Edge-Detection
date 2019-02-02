@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     int framecount = static_cast<int>(video.get(CV_CAP_PROP_FRAME_COUNT));
     int framenum = 0;
 
-    VideoWriter output(outFile,CV_FOURCC('M','J','P','G'),FPS, Size(width,height));
+    VideoWriter output(outFile,CV_FOURCC('X','2','6','4'),FPS, Size(width,height));
     /*
 
     1. Extract frame.

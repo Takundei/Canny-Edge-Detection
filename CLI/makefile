@@ -15,7 +15,7 @@ $(prog)DB: $(prog).cpp
 				$(CC) -g $(prog).cpp -o $(prog)DB $(OPENCV)
 
 valgrind: 	$(prog)
-				valgrind ./$(prog)
+				valgrind ./$(prog) -i ../../f1.mp4 -o ../../f1.avi
 
 formart: 
 				astyle -A9 $(prog).cpp
