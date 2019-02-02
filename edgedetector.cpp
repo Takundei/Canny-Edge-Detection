@@ -22,6 +22,8 @@ bool Abort = false;
 static void at_abort_sigint (int signo) //When user presses ctr-c , save progress and exit
 {
     Abort = true;
+    /*Restore default signal handler*/
+    signal (SIGINT, SIG_DFL);
 }
 
 inline void RoundAngle(float &Gy,float Gx, float &angle)
@@ -88,7 +90,7 @@ int main(int argc, char** argv)
     /*Threshhold values*/
     int LOW = 30;
     int HIGH = 90;
-    
+    /* Handle SIGINT for terminating*/
     if (signal (SIGINT, at_abort_sigint) == SIG_ERR) {
         cerr<<"Cannot handle SIGINT!"<<endl;
         exit (EXIT_FAILURE);
@@ -119,19 +121,21 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
 
     }
-
+    /*open video*/
     VideoCapture video(inFile);
     if(!video.isOpened()) {
         cerr<<"Error opening video";
         exit(EXIT_FAILURE);
     }
 
-    /*get width, height and fps*/
+    /*get width, height and fps for the output video*/
     int width = static_cast<int>(video.get(CV_CAP_PROP_FRAME_WIDTH));
     int height = static_cast<int>(video.get(CV_CAP_PROP_FRAME_HEIGHT));
+    double FPS = video.get(CV_CAP_PROP_FPS);
+
+    /*Initialize progress*/
     int framecount = static_cast<int>(video.get(CV_CAP_PROP_FRAME_COUNT));
     int framenum = 0;
-    double FPS = video.get(CV_CAP_PROP_FPS);
 
     VideoWriter output(outFile,CV_FOURCC('M','J','P','G'),FPS, Size(width,height));
     /*
@@ -143,7 +147,7 @@ int main(int argc, char** argv)
     5. Find all pixels that are local maximum.
     6. Apply thesholding to mark Strong pixels(in final video) and Weak pixels (to be considered for inclusion)
     7. If a weak pixel is adjacent to - along the edge of - a strong pixel ; mark it as strong. Repeat until no more pixels are marked to strong;
-    9. Remove all weak pixels
+    8. Remove all weak pixels
 
     */
     cout << "Converting ..."<<endl;
@@ -166,8 +170,8 @@ int main(int argc, char** argv)
         Sobel(frame,Gy,CV_32F,0,1);
 
         magnitude(Gx,Gy,Gradient);
-
-        Mat Theta = Mat(frame.rows,frame.cols,CV_32F); //stores the rounded angle (direction of gradient)
+        /*stores the rounded angle (direction of gradient)*/
+        Mat Theta = Mat(frame.rows,frame.cols,CV_32F);
         Mat Final = Mat(Gradient.rows,Gradient.cols,CV_8U,Scalar(0)); //final frame
 
         MatIterator_<float> itG = Gradient.begin<float>();
@@ -188,8 +192,9 @@ int main(int argc, char** argv)
             if(*itG < LOW) {
                 continue;   //already lower than threshold ->ignore
             }
-
+            /*Get Angles*/
             RoundAngle(*itGy,*itGx,*itT);
+            /*Find neigbhors*/
             Adjacent(*itT,Apx);
             //5
             if(*itG > Gradient.at<float>(px.y + Apx.y1,px.x + Apx.x1) && *itG > Gradient.at<float>(px.y + Apx.y2,px.x + Apx.x2)) {
@@ -209,14 +214,14 @@ int main(int argc, char** argv)
         while(changed) {
             changed = false;
             for(int row = 1; row < Final.rows -1; ++row) {
+                px = Final.ptr<unsigned char>(row);
+                T = Theta.ptr<float>(row);
                 for(int col = 1; col < Final.cols-1; ++col) {
-
                     if(px[col] == 64) {
-                        px = Final.ptr<unsigned char>(row);
-                        T = Theta.ptr<float>(row);
-                        Adjacent(*T,Apx,edge_tracking);
+                        Adjacent(*T,Apx,edge_tracking);//get adjacent for p1 and p2
                         p1 = Final.ptr<unsigned char>(row + Apx.y1);
                         p2 = Final.ptr<unsigned char>(row + Apx.y2);
+                        /*if either p1/p2 is strong , set current to strong*/
                         if(p1[col + Apx.x1] == 255 || p2[col + Apx.x2] == 255) {
                             px[col] = 255;
                             changed = true;
@@ -231,13 +236,12 @@ int main(int argc, char** argv)
         //Store frame to final video
         cvtColor(Final,frame,COLOR_GRAY2BGR);
         output.write(frame);
-
-        if (waitKey(30) == 27) break; //press ESC to abort
     }
     cout<<"\nDone\n";
+
     video.release();
     output.release();
-    signal (SIGINT, SIG_DFL);
+
     destroyAllWindows();
     return EXIT_SUCCESS;
 
