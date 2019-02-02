@@ -1,1 +1,0 @@
-# Canny-Edge-Detection
