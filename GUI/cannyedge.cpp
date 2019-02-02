@@ -11,6 +11,7 @@ CannyEdge::CannyEdge(QWidget *parent) :
     ui->setupUi(this);
     HIGH = 60;
     LOW = 20;
+    /* Start in Videos directory*/
     path = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
     abort = true;
     //initialise QGraphicsview
@@ -29,15 +30,15 @@ CannyEdge::CannyEdge(QWidget *parent) :
     ui->ThreshHigh->setValue(HIGH);
     ui->progressBar->setMinimum(0);
     //hide features
-  ui->progressBar->setEnabled(false);
-   ui->Abort->setEnabled(false);
+    ui->progressBar->setEnabled(false);
+    ui->Abort->setEnabled(false);
 }
 
 CannyEdge::~CannyEdge()
 {
     delete ui;
 }
-
+/*At window close , make sure conversion is stoped */
 void CannyEdge::closeEvent(QCloseEvent *event){
     if(!abort){
         QMessageBox::warning(this,"Warning","Please Click \"Abort\" before closing");
@@ -46,7 +47,7 @@ void CannyEdge::closeEvent(QCloseEvent *event){
         event->accept();
     }
 }
-
+/*Save as button */
 void CannyEdge::on_Save_clicked()
 {
     OutputVideo = QFileDialog::getSaveFileName(this, "Save As",path);
@@ -55,7 +56,7 @@ void CannyEdge::on_Save_clicked()
     ui->outputVid->setText(OutputVideo);
 
 }
-
+/*Open button */
 void CannyEdge::on_Open_clicked()
 {
     InputVideo = QFileDialog::getOpenFileName(this, "Save As",path,tr("Videos (*.MOV *.avi *.mp4);; All Files(*.*)"));
@@ -65,7 +66,7 @@ void CannyEdge::on_Open_clicked()
     ui->outputVid->setText(OutputVideo);
     ui->progressBar->setValue(0);
 }
-
+/*Start conversion */
 void CannyEdge::on_Convert_clicked()
 {
     ui->Open->setEnabled(false);
@@ -78,7 +79,7 @@ void CannyEdge::on_Convert_clicked()
     ui->Convert->setEnabled(false);
     ui->Abort->setEnabled(true);
     ui->About->setVisible(false);
-       int ret = 0;
+    int ret = 0;
     abort = false;
     waitKey(30);
     ret = CannyEdgeDetection();
@@ -116,8 +117,10 @@ void CannyEdge::on_ThreshHigh_valueChanged(int arg1)
     HIGH = arg1;
     ui->ThreshLow->setMaximum(HIGH);
 }
+/*determines the neigbhours that are chosen :along gradient OR perpendicular*/
 
-enum Mode {non_maximum_suppression , edge_tracking}; //determines the neigbors that are chosen :along gradient ; perpendicular
+enum Mode {non_maximum_suppression , edge_tracking};
+/*pixel (i,j) is adjacent to pixels (i + x1 , j + y1) and (i + x2 , j + y2)*/
 
 struct AdjacentPixels{
     char x1,x2,y1,y2;
@@ -141,30 +144,34 @@ inline void RoundAngle(float &Gy,float Gx, float &angle){
 }
 
 inline void Adjacent(float &angle,AdjacentPixels &A,Mode mode = non_maximum_suppression ){
+    /*	finds pixels along the same gradient:
+                -non-maximum suppression - compare pixels along the gradient
+                -Double Thresholding - compare pixels perpendicular to the gradient
 
+    */
     if(mode == edge_tracking){
         angle = angle < 90 ? angle + 90:angle -90;
     }
     switch(static_cast<int>(angle)){
-    case 0: //0 x G = E->W
+    case 0: //Gradient = E->W
         A.x1 = -1;
         A.x2 = 1;
         A.y1 = 0;
         A.y2 = 0;
         break;
-    case 135://135 G = NE / SW
+    case 135://Gradient = NE / SW
         A.x1 = 1;
         A.x2 =-1;
         A.y1 = -1;
         A.y2 = 1;
         break;
-    case 90: //90  G = N / S
+    case 90: //Gradient = N / S
         A.x1 = 0;
         A.x2 = 0;
         A.y1 = -1;
         A.y2 = 1;
         break;
-    case 45://45 G = NW / SE
+    case 45://Gradient = NW / SE
         A.x1 = -1;
         A.x2 = 1;
         A.y1 = -1;
@@ -204,7 +211,7 @@ int CannyEdge::CannyEdgeDetection(){
 
         framecount ++;
         ui->progressBar->setValue(framecount);
-        //convert original to Qimage
+        //convert original to Qimage for preview
         QImage QImageOrig;
         if(preview){
             height=ui->previewOriginal->height();
@@ -220,7 +227,7 @@ int CannyEdge::CannyEdgeDetection(){
         Sobel(frame,Gy,CV_32F,0,1);
 
         magnitude(Gx,Gy,Gradient);
-
+        /*stores the rounded angle (direction of gradient)*/
         Mat Theta = Mat(frame.rows,frame.cols,CV_32F);
         Mat Final = Mat(Gradient.rows,Gradient.cols,CV_8U,Scalar(0));
 
@@ -237,15 +244,16 @@ int CannyEdge::CannyEdgeDetection(){
             const Point px = itG.pos(); //current px
             if(px.x < 2 || px.y < 2 || px.x > frame.cols -2 || px.y > frame.rows-2){continue;}
             if(*itG < LOW){continue;} //already lower than threshold ->ignore
-
+            /*Get Angles*/
             RoundAngle(*itGy,*itGx,*itT);
+            /*Find neigbhours*/
             Adjacent(*itT,Apx);
 
             if(*itG > Gradient.at<float>(px.y + Apx.y1,px.x + Apx.x1) && *itG > Gradient.at<float>(px.y + Apx.y2,px.x + Apx.x2)){
                 if(*itG >= HIGH){
-                    *itF = 255; //include in final
+                    *itF = 255; //mark as a strong pixel
                 }else{
-                    *itF  = 64;
+                    *itF  = 64;//mark as a weak pixel
                 }
             }
 
@@ -253,12 +261,12 @@ int CannyEdge::CannyEdgeDetection(){
 
         unsigned char* px,*p1,*p2;
         float *T;
-        bool changed = true;
-        while(changed){
+        bool changed = true;//indicates that new strong pixels have been added
+                while(changed){
             changed = false;
             for(int row = 1; row < Final.rows -1; ++row) {
+                px = Final.ptr<unsigned char>(row);
                 for(int col = 1; col < Final.cols-1; ++col) {
-                    px = Final.ptr<unsigned char>(row);
                     if(px[col] == 64){
                         T = Theta.ptr<float>(row);
                         Adjacent(*T,Apx,edge_tracking);
@@ -277,7 +285,7 @@ int CannyEdge::CannyEdgeDetection(){
 
         cvtColor(Final,frame,COLOR_GRAY2BGR);
         output.write(frame);
-
+        //display preview
         if(preview){
             height=ui->previewEdited->height();
             width=ui->previewEdited->width();

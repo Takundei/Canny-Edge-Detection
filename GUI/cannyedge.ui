@@ -289,7 +289,7 @@
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
-	background-color: rgb(239, 41, 41)
+	background-color: rgb(136, 138, 133)
 }</string>
     </property>
     <property name="text">

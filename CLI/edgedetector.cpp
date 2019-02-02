@@ -8,7 +8,7 @@
 using namespace std;
 using namespace cv;
 
-/*determines the neigbors that are chosen :along gradient OR perpendicular*/
+/*determines the neigbhours that are chosen :along gradient OR perpendicular*/
 
 enum Mode {non_maximum_suppression, edge_tracking};
 
@@ -96,6 +96,7 @@ int main(int argc, char** argv)
         exit (EXIT_FAILURE);
     }
     int opt;
+    /* Parse command line args*/
     while((opt = getopt(argc,argv,"i:o:l:h:")) != -1) {
         switch(opt) {
         case 'i'://input filename
@@ -194,7 +195,7 @@ int main(int argc, char** argv)
             }
             /*Get Angles*/
             RoundAngle(*itGy,*itGx,*itT);
-            /*Find neigbhors*/
+            /*Find neigbhours*/
             Adjacent(*itT,Apx);
             //5
             if(*itG > Gradient.at<float>(px.y + Apx.y1,px.x + Apx.x1) && *itG > Gradient.at<float>(px.y + Apx.y2,px.x + Apx.x2)) {
