@@ -63,6 +63,7 @@ void CannyEdge::on_Open_clicked()
     path = QFileInfo(InputVideo).path();
     OutputVideo =path+"/"+ QFileInfo(InputVideo).baseName() + ".avi";
     ui->outputVid->setText(OutputVideo);
+    ui->progressBar->setValue(0);
 }
 
 void CannyEdge::on_Convert_clicked()
@@ -82,7 +83,6 @@ void CannyEdge::on_Convert_clicked()
     waitKey(30);
     ret = CannyEdgeDetection();
     if(ret == 1){
-         ui->About->setVisible(true);
         QMessageBox::warning(this,"Warning","Error opening video");
     }
     abort = true;
