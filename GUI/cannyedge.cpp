@@ -297,7 +297,6 @@ int CannyEdge::CannyEdgeDetection(){
 
     video.release();
     output.release();
-    destroyAllWindows();
     return 0;
 
 }
