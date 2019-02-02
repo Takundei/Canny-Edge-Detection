@@ -49,15 +49,22 @@ protected:
     void closeEvent(QCloseEvent *event);
 private:
     Ui::CannyEdge *ui;
+    /*Threshhold values*/
     int LOW;
     int HIGH;
+    /*Abort botton presed*/
     bool abort;
+    /* Show Preview*/
     bool preview;
+    /*IO filenames */
     QString InputVideo = " ";
     QString OutputVideo = " ";
+    /*Display preview video */
     QGraphicsPixmapItem originalVideo;
     QGraphicsPixmapItem editedVideo;
+    /*The Algorithm */
     int CannyEdgeDetection();
+    /*Curent working Directory */
     QString path;
 };
 
