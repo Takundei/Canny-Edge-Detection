@@ -12,17 +12,37 @@ CannyEdge::CannyEdge(QWidget *parent) :
     HIGH = 60;
     LOW = 20;
     path = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
+    abort = true;
+    //initialise QGraphicsview
+    preview = true;
+    ui->previewOriginal->setScene(new QGraphicsScene(this));
+    ui->previewOriginal->scene()->addItem(&originalVideo);
+    ui->previewOriginal->fitInView(&originalVideo, Qt::KeepAspectRatio);
+    ui->previewEdited->fitInView(&editedVideo, Qt::KeepAspectRatio);
+    ui->previewEdited->setScene(new QGraphicsScene(this));
+    ui->previewEdited->scene()->addItem(&editedVideo);
+    //set threshhold
     ui->ThreshLow->setValue(LOW);
     ui->ThreshLow->setMaximum(HIGH);
     ui->ThreshHigh->setValue(HIGH);
     ui->progressBar->setMinimum(0);
-    ui->progressBar->setVisible(false);
-    ui->Abort->setVisible(false);
+    //hide features
+  ui->progressBar->setEnabled(false);
+   ui->Abort->setEnabled(false);
 }
 
 CannyEdge::~CannyEdge()
 {
     delete ui;
+}
+
+void CannyEdge::closeEvent(QCloseEvent *event){
+    if(!abort){
+        QMessageBox::warning(this,"Warning","Please Click \"Abort\" before closing");
+        event->ignore();
+    }else{
+        event->accept();
+    }
 }
 
 void CannyEdge::on_Save_clicked()
@@ -38,8 +58,8 @@ void CannyEdge::on_Open_clicked()
 {
     InputVideo = QFileDialog::getOpenFileName(this, "Save As",path,tr("Videos (*.MOV *.avi *.mp4);; All Files(*.*)"));
     ui->inputVid->setText(InputVideo);
-    OutputVideo += InputVideo + ".avi";
     path = QFileInfo(InputVideo).path();
+    OutputVideo =path+"/"+ QFileInfo(InputVideo).baseName() + ".avi";
     ui->outputVid->setText(OutputVideo);
 }
 
@@ -51,22 +71,18 @@ void CannyEdge::on_Convert_clicked()
     ui->Save->setEnabled(false);
     ui->ThreshLow->setEnabled(false);
     ui->ThreshHigh->setEnabled(false);
-    ui->progressBar->setVisible(true);
+    ui->progressBar->setEnabled(true);
     ui->Convert->setEnabled(false);
-    ui->Convert->setVisible(false);
     ui->Abort->setEnabled(true);
-    ui->Abort->setVisible(true);
-    int ret = 0;
+       int ret = 0;
     abort = false;
     waitKey(30);
     ret = CannyEdgeDetection();
     if(ret == 1){
         QMessageBox::warning(this,"Warning","Error opening video");
     }
-
+    abort = true;
     ui->Convert->setEnabled(true);
-    ui->Convert->setVisible(true);
-    ui->Abort->setVisible(false);
     ui->Abort->setEnabled(false);
     ui->Open->setEnabled(true);
     ui->inputVid->setEnabled(true);
@@ -74,7 +90,8 @@ void CannyEdge::on_Convert_clicked()
     ui->Save->setEnabled(true);
     ui->ThreshLow->setEnabled(true);
     ui->ThreshHigh->setEnabled(true);
-    ui->progressBar->setVisible(false);
+    ui->progressBar->setEnabled(false);
+    ui->Abort->setEnabled(false);
 
 }
 
@@ -169,7 +186,8 @@ int CannyEdge::CannyEdgeDetection(){
 
     ui->progressBar->setMaximum(framecount);
     framecount = 0;
-    VideoWriter output(OutputVideo.toUtf8().constData(),CV_FOURCC('M','J','P','G'),FPS, Size(width,height));
+    VideoWriter output(OutputVideo.toUtf8().constData(),CV_FOURCC('X','2','6','4'),FPS, Size(width,height));
+
     for(;!abort;){
         QApplication::processEvents();
         Mat frame;
@@ -179,8 +197,17 @@ int CannyEdge::CannyEdgeDetection(){
         if(frame.empty()){
             break;
         }
+
         framecount ++;
         ui->progressBar->setValue(framecount);
+        //convert original to Qimage
+        QImage QImageOrig;
+        if(preview){
+            height=ui->previewOriginal->height();
+            width=ui->previewOriginal->width();
+            QImageOrig = QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+            originalVideo.setPixmap( QPixmap::fromImage(QImageOrig.rgbSwapped()).scaled(width,height,Qt::KeepAspectRatio));
+        }
 
         cvtColor(frame,frame,COLOR_BGR2GRAY);
 
@@ -246,10 +273,19 @@ int CannyEdge::CannyEdgeDetection(){
 
         cvtColor(Final,frame,COLOR_GRAY2BGR);
         output.write(frame);
+
+        if(preview){
+            height=ui->previewEdited->height();
+            width=ui->previewEdited->width();
+            QImage QImageEdited(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+            editedVideo.setPixmap( QPixmap::fromImage(QImageEdited.rgbSwapped()).scaled(width,height,Qt::KeepAspectRatio) );
+
+        }
     }
 
     video.release();
     output.release();
+    destroyAllWindows();
     return 0;
 
 }
@@ -264,4 +300,14 @@ void CannyEdge::on_inputVid_textEdited(const QString &arg1)
 void CannyEdge::on_outputVid_textEdited(const QString &arg1)
 {
     OutputVideo = arg1;
+}
+
+void CannyEdge::on_Preview_clicked()
+{
+    preview = !preview;
+    if(preview){
+        ui->Preview->setText("ON");
+    }else{
+        ui->Preview->setText("OFF");
+    }
 }

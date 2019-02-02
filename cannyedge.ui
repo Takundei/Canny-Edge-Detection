@@ -6,21 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>356</width>
-    <height>281</height>
+    <width>996</width>
+    <height>414</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>996</width>
+    <height>414</height>
+   </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>356</width>
-    <height>300</height>
+    <width>996</width>
+    <height>414</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Canny Edge Detection</string>
-  </property>
-  <property name="windowOpacity">
-   <double>1.000000000000000</double>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
@@ -30,28 +33,40 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>29</y>
+      <y>229</y>
       <width>241</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>241</width>
+      <height>25</height>
+     </size>
     </property>
    </widget>
    <widget class="QLineEdit" name="outputVid">
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>80</y>
+      <y>280</y>
       <width>241</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>241</width>
+      <height>25</height>
+     </size>
     </property>
    </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>200</y>
-      <width>331</width>
+      <x>370</x>
+      <y>360</y>
+      <width>611</width>
       <height>31</height>
      </rect>
     </property>
@@ -69,15 +84,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>350</y>
       <width>191</width>
       <height>41</height>
      </rect>
     </property>
     <property name="maximumSize">
      <size>
-      <width>296</width>
-      <height>16777215</height>
+      <width>191</width>
+      <height>41</height>
      </size>
     </property>
     <property name="styleSheet">
@@ -92,21 +107,33 @@
    <widget class="QSpinBox" name="ThreshLow">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>110</y>
+      <x>120</x>
+      <y>310</y>
       <width>48</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>48</width>
+      <height>31</height>
+     </size>
     </property>
    </widget>
    <widget class="QSpinBox" name="ThreshHigh">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>110</y>
-      <width>48</width>
+      <x>210</x>
+      <y>310</y>
+      <width>51</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>51</width>
+      <height>31</height>
+     </size>
     </property>
     <property name="maximum">
      <number>255</number>
@@ -116,10 +143,16 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>80</y>
+      <y>280</y>
       <width>80</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>80</width>
+      <height>25</height>
+     </size>
     </property>
     <property name="text">
      <string>Save As</string>
@@ -129,10 +162,16 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>29</y>
+      <y>229</y>
       <width>80</width>
       <height>25</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>80</width>
+      <height>25</height>
+     </size>
     </property>
     <property name="text">
      <string>Open</string>
@@ -141,11 +180,17 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>120</y>
+      <x>10</x>
+      <y>320</y>
       <width>81</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>81</width>
+      <height>17</height>
+     </size>
     </property>
     <property name="text">
      <string>Threshold :</string>
@@ -154,11 +199,17 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>10</y>
+      <x>10</x>
+      <y>210</y>
       <width>141</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>141</width>
+      <height>17</height>
+     </size>
     </property>
     <property name="text">
      <string>Select Input Video :</string>
@@ -167,11 +218,17 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>60</y>
+      <x>10</x>
+      <y>260</y>
       <width>181</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>181</width>
+      <height>17</height>
+     </size>
     </property>
     <property name="text">
      <string>Output Destination :</string>
@@ -180,11 +237,17 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>120</y>
+      <x>90</x>
+      <y>320</y>
       <width>41</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>41</width>
+      <height>17</height>
+     </size>
     </property>
     <property name="text">
      <string>Low</string>
@@ -193,11 +256,17 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>120</y>
-      <width>67</width>
+      <x>170</x>
+      <y>320</y>
+      <width>31</width>
       <height>17</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>31</width>
+      <height>17</height>
+     </size>
     </property>
     <property name="text">
      <string>High</string>
@@ -207,10 +276,16 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>150</y>
+      <y>350</y>
       <width>131</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>131</width>
+      <height>41</height>
+     </size>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
@@ -221,16 +296,85 @@
      <string>Abort</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>356</width>
-     <height>22</height>
-    </rect>
-   </property>
+   <widget class="QGraphicsView" name="previewOriginal">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>351</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>351</width>
+      <height>191</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QGraphicsView" name="previewEdited">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>10</y>
+      <width>611</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>611</width>
+      <height>341</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>611</width>
+      <height>341</height>
+     </size>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>320</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>67</width>
+      <height>17</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Preview:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Preview">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>310</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>31</width>
+      <height>31</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>OFF</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
